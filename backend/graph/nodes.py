@@ -277,6 +277,7 @@ async def clarification_node(state: AgentState) -> AgentState:
     """
     state["requires_clarification"] = True
     state["response_type"] = "clarification_question"
+    state["active_agent"] = "qa_agent"
 
     # 根据输入生成澄清问题
     questions = [

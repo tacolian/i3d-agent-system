@@ -22,9 +22,10 @@ async def health_check():
 
     # 检查数据库连接
     try:
+        from sqlalchemy import text
         from ...db.session import async_engine
         async with async_engine.connect() as conn:
-            await conn.execute("SELECT 1")
+            await conn.execute(text("SELECT 1"))
         services["database"] = "healthy"
     except Exception:
         services["database"] = "unhealthy"
@@ -84,8 +85,9 @@ async def readiness():
         from ...services.cache_service import get_cache_service
 
         # 数据库连接检查
+        from sqlalchemy import text
         async with async_engine.connect() as conn:
-            await conn.execute("SELECT 1")
+            await conn.execute(text("SELECT 1"))
 
         # Redis连接检查
         cache = get_cache_service()

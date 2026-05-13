@@ -4,7 +4,6 @@ Agent工作流定义
 """
 from typing import Optional, Dict, Any
 from langgraph.graph import StateGraph, END
-from langgraph.checkpoint.postgres import PostgresCheckpointSaver
 from langchain_core.runnables import RunnableConfig
 
 from .state import AgentState, create_state
@@ -17,7 +16,6 @@ from .nodes import (
     qa_node,
     synthesizer_node,
     clarification_node,
-    error_handler_node,
 )
 from .edges import (
     route_after_intent,
@@ -49,7 +47,7 @@ class AgentWorkflow:
         workflow = StateGraph(AgentState)
 
         # 添加节点
-        workflow.add_node("intent", intent_node)
+        workflow.add_node("intent_classifier", intent_node)
         workflow.add_node("retrieval", retrieval_node)
         workflow.add_node("search_agent", search_node)
         workflow.add_node("analysis_agent", analysis_node)
@@ -57,14 +55,13 @@ class AgentWorkflow:
         workflow.add_node("qa_agent", qa_node)
         workflow.add_node("synthesizer", synthesizer_node)
         workflow.add_node("clarification", clarification_node)
-        workflow.add_node("error_handler", error_handler_node)
-
+    
         # 设置入口点
-        workflow.set_entry_point("intent")
+        workflow.set_entry_point("intent_classifier")
 
         # 添加边（条件路由）
         workflow.add_conditional_edges(
-            "intent",
+            "intent_classifier",
             route_after_intent,
             {
                 "retrieval": "retrieval",
@@ -92,7 +89,6 @@ class AgentWorkflow:
         # 综合节点到结束
         workflow.add_edge("synthesizer", END)
         workflow.add_edge("clarification", END)
-        workflow.add_edge("error_handler", END)
 
         # 编译图
         self.graph = workflow.compile()

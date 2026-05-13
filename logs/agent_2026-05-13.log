@@ -1,0 +1,975 @@
+2026-05-13 10:00:26,939 - backend.main - INFO - Starting i3d-agent-system v1.0.0
+2026-05-13 10:00:26,992 - backend.main - ERROR - Failed to initialize database: Not an executable object: 'CREATE EXTENSION IF NOT EXISTS vector'
+2026-05-13 10:00:26,993 - backend.main - INFO - Server running on 0.0.0.0:8000
+2026-05-13 10:02:41,908 - backend.main - INFO - Shutting down...
+2026-05-13 10:02:41,912 - backend.main - INFO - Shutdown complete
+2026-05-13 10:02:48,330 - backend.main - INFO - Starting i3d-agent-system v1.0.0
+2026-05-13 10:02:48,463 - backend.main - INFO - Database initialized
+2026-05-13 10:02:48,464 - backend.main - INFO - Server running on 0.0.0.0:8000
+2026-05-13 12:19:15,051 - backend.main - INFO - Shutting down...
+2026-05-13 12:19:15,282 - backend.main - INFO - Shutdown complete
+2026-05-13 12:19:30,463 - backend.main - INFO - Starting i3d-agent-system v1.0.0
+2026-05-13 12:19:30,588 - sqlalchemy.engine.Engine - INFO - select pg_catalog.version()
+2026-05-13 12:19:30,589 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2026-05-13 12:19:30,595 - sqlalchemy.engine.Engine - INFO - select current_schema()
+2026-05-13 12:19:30,596 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2026-05-13 12:19:30,600 - sqlalchemy.engine.Engine - INFO - show standard_conforming_strings
+2026-05-13 12:19:30,601 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2026-05-13 12:19:30,604 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2026-05-13 12:19:30,606 - sqlalchemy.engine.Engine - INFO - CREATE EXTENSION IF NOT EXISTS vector
+2026-05-13 12:19:30,608 - sqlalchemy.engine.Engine - INFO - [generated in 0.00175s] ()
+2026-05-13 12:19:30,613 - sqlalchemy.engine.Engine - INFO - CREATE EXTENSION IF NOT EXISTS "uuid-ossp"
+2026-05-13 12:19:30,614 - sqlalchemy.engine.Engine - INFO - [generated in 0.00093s] ()
+2026-05-13 12:19:30,616 - sqlalchemy.engine.Engine - INFO - COMMIT
+2026-05-13 12:19:30,617 - backend.main - INFO - Database initialized
+2026-05-13 12:19:30,618 - backend.main - INFO - Server running on 0.0.0.0:8000
+2026-05-13 12:25:15,084 - backend.main - INFO - Shutting down...
+2026-05-13 12:25:15,095 - backend.main - INFO - Shutdown complete
+2026-05-13 12:25:24,306 - backend.main - INFO - Starting i3d-agent-system v1.0.0
+2026-05-13 12:25:24,369 - sqlalchemy.engine.Engine - INFO - select pg_catalog.version()
+2026-05-13 12:25:24,371 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2026-05-13 12:25:24,376 - sqlalchemy.engine.Engine - INFO - select current_schema()
+2026-05-13 12:25:24,377 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2026-05-13 12:25:24,382 - sqlalchemy.engine.Engine - INFO - show standard_conforming_strings
+2026-05-13 12:25:24,384 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2026-05-13 12:25:24,386 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2026-05-13 12:25:24,387 - sqlalchemy.engine.Engine - INFO - CREATE EXTENSION IF NOT EXISTS vector
+2026-05-13 12:25:24,388 - sqlalchemy.engine.Engine - INFO - [generated in 0.00094s] ()
+2026-05-13 12:25:24,391 - sqlalchemy.engine.Engine - INFO - CREATE EXTENSION IF NOT EXISTS "uuid-ossp"
+2026-05-13 12:25:24,392 - sqlalchemy.engine.Engine - INFO - [generated in 0.00077s] ()
+2026-05-13 12:25:24,393 - sqlalchemy.engine.Engine - INFO - 
+            CREATE TABLE IF NOT EXISTS chat_history (
+                id SERIAL PRIMARY KEY,
+                session_id TEXT NOT NULL,
+                tenant_id TEXT NOT NULL,
+                role TEXT NOT NULL,
+                content TEXT NOT NULL,
+                metadata JSONB DEFAULT '{}',
+                created_at TIMESTAMP DEFAULT NOW()
+            )
+        
+2026-05-13 12:25:24,394 - sqlalchemy.engine.Engine - INFO - [generated in 0.00087s] ()
+2026-05-13 12:25:24,475 - sqlalchemy.engine.Engine - INFO - 
+                CREATE TABLE IF NOT EXISTS tenant_shenfa_vectors (
+                    chunk_id TEXT PRIMARY KEY,
+                    content TEXT,
+                    embedding VECTOR(1536),
+                    metadata JSONB DEFAULT '{}',
+                    created_at TIMESTAMP DEFAULT NOW(),
+                    item_code TEXT,
+                    file_name TEXT,
+                    file_path TEXT,
+                    textsearchable_index_col TSVECTOR
+                )
+            
+2026-05-13 12:25:24,477 - sqlalchemy.engine.Engine - INFO - [generated in 0.00173s] ()
+2026-05-13 12:25:24,517 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_shenfa_vectors_textsearch
+                ON tenant_shenfa_vectors
+                USING GIN (textsearchable_index_col)
+            
+2026-05-13 12:25:24,517 - sqlalchemy.engine.Engine - INFO - [generated in 0.00090s] ()
+2026-05-13 12:25:24,523 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_shenfa_vectors_embedding
+                ON tenant_shenfa_vectors
+                USING HNSW (embedding vector_cosine_ops)
+            
+2026-05-13 12:25:24,523 - sqlalchemy.engine.Engine - INFO - [generated in 0.00083s] ()
+2026-05-13 12:25:24,529 - sqlalchemy.engine.Engine - INFO - 
+                CREATE TABLE IF NOT EXISTS tenant_meidi_vectors (
+                    chunk_id TEXT PRIMARY KEY,
+                    content TEXT,
+                    embedding VECTOR(1536),
+                    metadata JSONB DEFAULT '{}',
+                    created_at TIMESTAMP DEFAULT NOW(),
+                    item_code TEXT,
+                    file_name TEXT,
+                    file_path TEXT,
+                    textsearchable_index_col TSVECTOR
+                )
+            
+2026-05-13 12:25:24,530 - sqlalchemy.engine.Engine - INFO - [generated in 0.00115s] ()
+2026-05-13 12:25:24,540 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_meidi_vectors_textsearch
+                ON tenant_meidi_vectors
+                USING GIN (textsearchable_index_col)
+            
+2026-05-13 12:25:24,541 - sqlalchemy.engine.Engine - INFO - [generated in 0.00079s] ()
+2026-05-13 12:25:24,543 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_meidi_vectors_embedding
+                ON tenant_meidi_vectors
+                USING HNSW (embedding vector_cosine_ops)
+            
+2026-05-13 12:25:24,544 - sqlalchemy.engine.Engine - INFO - [generated in 0.00079s] ()
+2026-05-13 12:25:24,547 - sqlalchemy.engine.Engine - INFO - 
+                CREATE TABLE IF NOT EXISTS tenant_dongjiang_vectors (
+                    chunk_id TEXT PRIMARY KEY,
+                    content TEXT,
+                    embedding VECTOR(1536),
+                    metadata JSONB DEFAULT '{}',
+                    created_at TIMESTAMP DEFAULT NOW(),
+                    item_code TEXT,
+                    file_name TEXT,
+                    file_path TEXT,
+                    textsearchable_index_col TSVECTOR
+                )
+            
+2026-05-13 12:25:24,548 - sqlalchemy.engine.Engine - INFO - [generated in 0.00102s] ()
+2026-05-13 12:25:24,558 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_dongjiang_vectors_textsearch
+                ON tenant_dongjiang_vectors
+                USING GIN (textsearchable_index_col)
+            
+2026-05-13 12:25:24,559 - sqlalchemy.engine.Engine - INFO - [generated in 0.00085s] ()
+2026-05-13 12:25:24,561 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_dongjiang_vectors_embedding
+                ON tenant_dongjiang_vectors
+                USING HNSW (embedding vector_cosine_ops)
+            
+2026-05-13 12:25:24,561 - sqlalchemy.engine.Engine - INFO - [generated in 0.00072s] ()
+2026-05-13 12:25:24,564 - sqlalchemy.engine.Engine - INFO - 
+                CREATE TABLE IF NOT EXISTS tenant_huabei_vectors (
+                    chunk_id TEXT PRIMARY KEY,
+                    content TEXT,
+                    embedding VECTOR(1536),
+                    metadata JSONB DEFAULT '{}',
+                    created_at TIMESTAMP DEFAULT NOW(),
+                    item_code TEXT,
+                    file_name TEXT,
+                    file_path TEXT,
+                    textsearchable_index_col TSVECTOR
+                )
+            
+2026-05-13 12:25:24,565 - sqlalchemy.engine.Engine - INFO - [generated in 0.00070s] ()
+2026-05-13 12:25:24,574 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_huabei_vectors_textsearch
+                ON tenant_huabei_vectors
+                USING GIN (textsearchable_index_col)
+            
+2026-05-13 12:25:24,575 - sqlalchemy.engine.Engine - INFO - [generated in 0.00098s] ()
+2026-05-13 12:25:24,578 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_huabei_vectors_embedding
+                ON tenant_huabei_vectors
+                USING HNSW (embedding vector_cosine_ops)
+            
+2026-05-13 12:25:24,580 - sqlalchemy.engine.Engine - INFO - [generated in 0.00176s] ()
+2026-05-13 12:25:24,582 - sqlalchemy.engine.Engine - INFO - COMMIT
+2026-05-13 12:25:24,586 - backend.main - INFO - Database initialized
+2026-05-13 12:25:24,587 - backend.main - INFO - Server running on 0.0.0.0:8000
+2026-05-13 12:26:39,504 - backend.main - INFO - Shutting down...
+2026-05-13 12:26:39,514 - backend.main - INFO - Shutdown complete
+2026-05-13 12:26:48,251 - backend.main - INFO - Starting i3d-agent-system v1.0.0
+2026-05-13 12:26:48,326 - sqlalchemy.engine.Engine - INFO - select pg_catalog.version()
+2026-05-13 12:26:48,328 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2026-05-13 12:26:48,336 - sqlalchemy.engine.Engine - INFO - select current_schema()
+2026-05-13 12:26:48,338 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2026-05-13 12:26:48,342 - sqlalchemy.engine.Engine - INFO - show standard_conforming_strings
+2026-05-13 12:26:48,343 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2026-05-13 12:26:48,349 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2026-05-13 12:26:48,352 - sqlalchemy.engine.Engine - INFO - CREATE EXTENSION IF NOT EXISTS vector
+2026-05-13 12:26:48,353 - sqlalchemy.engine.Engine - INFO - [generated in 0.00136s] ()
+2026-05-13 12:26:48,357 - sqlalchemy.engine.Engine - INFO - CREATE EXTENSION IF NOT EXISTS "uuid-ossp"
+2026-05-13 12:26:48,358 - sqlalchemy.engine.Engine - INFO - [generated in 0.00175s] ()
+2026-05-13 12:26:48,361 - sqlalchemy.engine.Engine - INFO - 
+            CREATE TABLE IF NOT EXISTS chat_history (
+                id SERIAL PRIMARY KEY,
+                session_id TEXT NOT NULL,
+                tenant_id TEXT NOT NULL,
+                role TEXT NOT NULL,
+                content TEXT NOT NULL,
+                metadata JSONB DEFAULT '{}',
+                created_at TIMESTAMP DEFAULT NOW()
+            )
+        
+2026-05-13 12:26:48,362 - sqlalchemy.engine.Engine - INFO - [generated in 0.00117s] ()
+2026-05-13 12:26:48,365 - sqlalchemy.engine.Engine - INFO - 
+                CREATE TABLE IF NOT EXISTS tenant_shenfa_vectors (
+                    chunk_id TEXT PRIMARY KEY,
+                    content TEXT,
+                    embedding VECTOR(1536),
+                    metadata JSONB DEFAULT '{}',
+                    created_at TIMESTAMP DEFAULT NOW(),
+                    item_code TEXT,
+                    file_name TEXT,
+                    file_path TEXT,
+                    textsearchable_index_col TSVECTOR
+                )
+            
+2026-05-13 12:26:48,366 - sqlalchemy.engine.Engine - INFO - [generated in 0.00097s] ()
+2026-05-13 12:26:48,368 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_shenfa_vectors_textsearch
+                ON tenant_shenfa_vectors
+                USING GIN (textsearchable_index_col)
+            
+2026-05-13 12:26:48,369 - sqlalchemy.engine.Engine - INFO - [generated in 0.00088s] ()
+2026-05-13 12:26:48,371 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_shenfa_vectors_embedding
+                ON tenant_shenfa_vectors
+                USING HNSW (embedding vector_cosine_ops)
+            
+2026-05-13 12:26:48,372 - sqlalchemy.engine.Engine - INFO - [generated in 0.00093s] ()
+2026-05-13 12:26:48,376 - sqlalchemy.engine.Engine - INFO - 
+                CREATE TABLE IF NOT EXISTS tenant_meidi_vectors (
+                    chunk_id TEXT PRIMARY KEY,
+                    content TEXT,
+                    embedding VECTOR(1536),
+                    metadata JSONB DEFAULT '{}',
+                    created_at TIMESTAMP DEFAULT NOW(),
+                    item_code TEXT,
+                    file_name TEXT,
+                    file_path TEXT,
+                    textsearchable_index_col TSVECTOR
+                )
+            
+2026-05-13 12:26:48,377 - sqlalchemy.engine.Engine - INFO - [generated in 0.00114s] ()
+2026-05-13 12:26:48,379 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_meidi_vectors_textsearch
+                ON tenant_meidi_vectors
+                USING GIN (textsearchable_index_col)
+            
+2026-05-13 12:26:48,380 - sqlalchemy.engine.Engine - INFO - [generated in 0.00080s] ()
+2026-05-13 12:26:48,382 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_meidi_vectors_embedding
+                ON tenant_meidi_vectors
+                USING HNSW (embedding vector_cosine_ops)
+            
+2026-05-13 12:26:48,383 - sqlalchemy.engine.Engine - INFO - [generated in 0.00080s] ()
+2026-05-13 12:26:48,386 - sqlalchemy.engine.Engine - INFO - 
+                CREATE TABLE IF NOT EXISTS tenant_dongjiang_vectors (
+                    chunk_id TEXT PRIMARY KEY,
+                    content TEXT,
+                    embedding VECTOR(1536),
+                    metadata JSONB DEFAULT '{}',
+                    created_at TIMESTAMP DEFAULT NOW(),
+                    item_code TEXT,
+                    file_name TEXT,
+                    file_path TEXT,
+                    textsearchable_index_col TSVECTOR
+                )
+            
+2026-05-13 12:26:48,387 - sqlalchemy.engine.Engine - INFO - [generated in 0.00094s] ()
+2026-05-13 12:26:48,389 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_dongjiang_vectors_textsearch
+                ON tenant_dongjiang_vectors
+                USING GIN (textsearchable_index_col)
+            
+2026-05-13 12:26:48,390 - sqlalchemy.engine.Engine - INFO - [generated in 0.00075s] ()
+2026-05-13 12:26:48,392 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_dongjiang_vectors_embedding
+                ON tenant_dongjiang_vectors
+                USING HNSW (embedding vector_cosine_ops)
+            
+2026-05-13 12:26:48,393 - sqlalchemy.engine.Engine - INFO - [generated in 0.00145s] ()
+2026-05-13 12:26:48,395 - sqlalchemy.engine.Engine - INFO - 
+                CREATE TABLE IF NOT EXISTS tenant_huabei_vectors (
+                    chunk_id TEXT PRIMARY KEY,
+                    content TEXT,
+                    embedding VECTOR(1536),
+                    metadata JSONB DEFAULT '{}',
+                    created_at TIMESTAMP DEFAULT NOW(),
+                    item_code TEXT,
+                    file_name TEXT,
+                    file_path TEXT,
+                    textsearchable_index_col TSVECTOR
+                )
+            
+2026-05-13 12:26:48,396 - sqlalchemy.engine.Engine - INFO - [generated in 0.00067s] ()
+2026-05-13 12:26:48,398 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_huabei_vectors_textsearch
+                ON tenant_huabei_vectors
+                USING GIN (textsearchable_index_col)
+            
+2026-05-13 12:26:48,398 - sqlalchemy.engine.Engine - INFO - [generated in 0.00083s] ()
+2026-05-13 12:26:48,400 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_huabei_vectors_embedding
+                ON tenant_huabei_vectors
+                USING HNSW (embedding vector_cosine_ops)
+            
+2026-05-13 12:26:48,401 - sqlalchemy.engine.Engine - INFO - [generated in 0.00072s] ()
+2026-05-13 12:26:48,403 - sqlalchemy.engine.Engine - INFO - COMMIT
+2026-05-13 12:26:48,404 - backend.main - INFO - Database initialized
+2026-05-13 12:26:48,405 - backend.main - INFO - Server running on 0.0.0.0:8000
+2026-05-13 12:27:08,003 - backend.main - INFO - Shutting down...
+2026-05-13 12:27:08,016 - backend.main - INFO - Shutdown complete
+2026-05-13 12:27:16,383 - backend.main - INFO - Starting i3d-agent-system v1.0.0
+2026-05-13 12:27:16,460 - sqlalchemy.engine.Engine - INFO - select pg_catalog.version()
+2026-05-13 12:27:16,461 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2026-05-13 12:27:16,466 - sqlalchemy.engine.Engine - INFO - select current_schema()
+2026-05-13 12:27:16,467 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2026-05-13 12:27:16,471 - sqlalchemy.engine.Engine - INFO - show standard_conforming_strings
+2026-05-13 12:27:16,472 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2026-05-13 12:27:16,474 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2026-05-13 12:27:16,476 - sqlalchemy.engine.Engine - INFO - CREATE EXTENSION IF NOT EXISTS vector
+2026-05-13 12:27:16,476 - sqlalchemy.engine.Engine - INFO - [generated in 0.00093s] ()
+2026-05-13 12:27:16,479 - sqlalchemy.engine.Engine - INFO - CREATE EXTENSION IF NOT EXISTS "uuid-ossp"
+2026-05-13 12:27:16,480 - sqlalchemy.engine.Engine - INFO - [generated in 0.00101s] ()
+2026-05-13 12:27:16,483 - sqlalchemy.engine.Engine - INFO - 
+            CREATE TABLE IF NOT EXISTS chat_history (
+                id SERIAL PRIMARY KEY,
+                session_id TEXT NOT NULL,
+                tenant_id TEXT NOT NULL,
+                role TEXT NOT NULL,
+                content TEXT NOT NULL,
+                metadata JSONB DEFAULT '{}',
+                created_at TIMESTAMP DEFAULT NOW()
+            )
+        
+2026-05-13 12:27:16,484 - sqlalchemy.engine.Engine - INFO - [generated in 0.00094s] ()
+2026-05-13 12:27:16,487 - sqlalchemy.engine.Engine - INFO - 
+                CREATE TABLE IF NOT EXISTS tenant_shenfa_vectors (
+                    chunk_id TEXT PRIMARY KEY,
+                    content TEXT,
+                    embedding VECTOR(1536),
+                    metadata JSONB DEFAULT '{}',
+                    created_at TIMESTAMP DEFAULT NOW(),
+                    item_code TEXT,
+                    file_name TEXT,
+                    file_path TEXT,
+                    textsearchable_index_col TSVECTOR
+                )
+            
+2026-05-13 12:27:16,488 - sqlalchemy.engine.Engine - INFO - [generated in 0.00117s] ()
+2026-05-13 12:27:16,490 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_shenfa_vectors_textsearch
+                ON tenant_shenfa_vectors
+                USING GIN (textsearchable_index_col)
+            
+2026-05-13 12:27:16,491 - sqlalchemy.engine.Engine - INFO - [generated in 0.00085s] ()
+2026-05-13 12:27:16,494 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_shenfa_vectors_embedding
+                ON tenant_shenfa_vectors
+                USING HNSW (embedding vector_cosine_ops)
+            
+2026-05-13 12:27:16,494 - sqlalchemy.engine.Engine - INFO - [generated in 0.00070s] ()
+2026-05-13 12:27:16,499 - sqlalchemy.engine.Engine - INFO - 
+                CREATE TABLE IF NOT EXISTS tenant_meidi_vectors (
+                    chunk_id TEXT PRIMARY KEY,
+                    content TEXT,
+                    embedding VECTOR(1536),
+                    metadata JSONB DEFAULT '{}',
+                    created_at TIMESTAMP DEFAULT NOW(),
+                    item_code TEXT,
+                    file_name TEXT,
+                    file_path TEXT,
+                    textsearchable_index_col TSVECTOR
+                )
+            
+2026-05-13 12:27:16,500 - sqlalchemy.engine.Engine - INFO - [generated in 0.00146s] ()
+2026-05-13 12:27:16,503 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_meidi_vectors_textsearch
+                ON tenant_meidi_vectors
+                USING GIN (textsearchable_index_col)
+            
+2026-05-13 12:27:16,504 - sqlalchemy.engine.Engine - INFO - [generated in 0.00082s] ()
+2026-05-13 12:27:16,506 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_meidi_vectors_embedding
+                ON tenant_meidi_vectors
+                USING HNSW (embedding vector_cosine_ops)
+            
+2026-05-13 12:27:16,507 - sqlalchemy.engine.Engine - INFO - [generated in 0.00082s] ()
+2026-05-13 12:27:16,509 - sqlalchemy.engine.Engine - INFO - 
+                CREATE TABLE IF NOT EXISTS tenant_dongjiang_vectors (
+                    chunk_id TEXT PRIMARY KEY,
+                    content TEXT,
+                    embedding VECTOR(1536),
+                    metadata JSONB DEFAULT '{}',
+                    created_at TIMESTAMP DEFAULT NOW(),
+                    item_code TEXT,
+                    file_name TEXT,
+                    file_path TEXT,
+                    textsearchable_index_col TSVECTOR
+                )
+            
+2026-05-13 12:27:16,509 - sqlalchemy.engine.Engine - INFO - [generated in 0.00071s] ()
+2026-05-13 12:27:16,511 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_dongjiang_vectors_textsearch
+                ON tenant_dongjiang_vectors
+                USING GIN (textsearchable_index_col)
+            
+2026-05-13 12:27:16,512 - sqlalchemy.engine.Engine - INFO - [generated in 0.00075s] ()
+2026-05-13 12:27:16,516 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_dongjiang_vectors_embedding
+                ON tenant_dongjiang_vectors
+                USING HNSW (embedding vector_cosine_ops)
+            
+2026-05-13 12:27:16,517 - sqlalchemy.engine.Engine - INFO - [generated in 0.00116s] ()
+2026-05-13 12:27:16,519 - sqlalchemy.engine.Engine - INFO - 
+                CREATE TABLE IF NOT EXISTS tenant_huabei_vectors (
+                    chunk_id TEXT PRIMARY KEY,
+                    content TEXT,
+                    embedding VECTOR(1536),
+                    metadata JSONB DEFAULT '{}',
+                    created_at TIMESTAMP DEFAULT NOW(),
+                    item_code TEXT,
+                    file_name TEXT,
+                    file_path TEXT,
+                    textsearchable_index_col TSVECTOR
+                )
+            
+2026-05-13 12:27:16,520 - sqlalchemy.engine.Engine - INFO - [generated in 0.00111s] ()
+2026-05-13 12:27:16,523 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_huabei_vectors_textsearch
+                ON tenant_huabei_vectors
+                USING GIN (textsearchable_index_col)
+            
+2026-05-13 12:27:16,524 - sqlalchemy.engine.Engine - INFO - [generated in 0.00086s] ()
+2026-05-13 12:27:16,526 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_huabei_vectors_embedding
+                ON tenant_huabei_vectors
+                USING HNSW (embedding vector_cosine_ops)
+            
+2026-05-13 12:27:16,527 - sqlalchemy.engine.Engine - INFO - [generated in 0.00094s] ()
+2026-05-13 12:27:16,529 - sqlalchemy.engine.Engine - INFO - COMMIT
+2026-05-13 12:27:16,531 - backend.main - INFO - Database initialized
+2026-05-13 12:27:16,532 - backend.main - INFO - Server running on 0.0.0.0:8000
+2026-05-13 12:27:43,555 - backend.main - INFO - Shutting down...
+2026-05-13 12:27:43,562 - backend.main - INFO - Shutdown complete
+2026-05-13 12:27:51,666 - backend.main - INFO - Starting i3d-agent-system v1.0.0
+2026-05-13 12:27:51,715 - sqlalchemy.engine.Engine - INFO - select pg_catalog.version()
+2026-05-13 12:27:51,716 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2026-05-13 12:27:51,720 - sqlalchemy.engine.Engine - INFO - select current_schema()
+2026-05-13 12:27:51,721 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2026-05-13 12:27:51,727 - sqlalchemy.engine.Engine - INFO - show standard_conforming_strings
+2026-05-13 12:27:51,727 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2026-05-13 12:27:51,730 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2026-05-13 12:27:51,732 - sqlalchemy.engine.Engine - INFO - CREATE EXTENSION IF NOT EXISTS vector
+2026-05-13 12:27:51,733 - sqlalchemy.engine.Engine - INFO - [generated in 0.00145s] ()
+2026-05-13 12:27:51,737 - sqlalchemy.engine.Engine - INFO - CREATE EXTENSION IF NOT EXISTS "uuid-ossp"
+2026-05-13 12:27:51,738 - sqlalchemy.engine.Engine - INFO - [generated in 0.00111s] ()
+2026-05-13 12:27:51,741 - sqlalchemy.engine.Engine - INFO - 
+            CREATE TABLE IF NOT EXISTS chat_history (
+                id SERIAL PRIMARY KEY,
+                session_id TEXT NOT NULL,
+                tenant_id TEXT NOT NULL,
+                role TEXT NOT NULL,
+                content TEXT NOT NULL,
+                metadata JSONB DEFAULT '{}',
+                created_at TIMESTAMP DEFAULT NOW()
+            )
+        
+2026-05-13 12:27:51,742 - sqlalchemy.engine.Engine - INFO - [generated in 0.00117s] ()
+2026-05-13 12:27:51,744 - sqlalchemy.engine.Engine - INFO - 
+                CREATE TABLE IF NOT EXISTS tenant_shenfa_vectors (
+                    chunk_id TEXT PRIMARY KEY,
+                    content TEXT,
+                    embedding VECTOR(1536),
+                    metadata JSONB DEFAULT '{}',
+                    created_at TIMESTAMP DEFAULT NOW(),
+                    item_code TEXT,
+                    file_name TEXT,
+                    file_path TEXT,
+                    textsearchable_index_col TSVECTOR
+                )
+            
+2026-05-13 12:27:51,745 - sqlalchemy.engine.Engine - INFO - [generated in 0.00095s] ()
+2026-05-13 12:27:51,749 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_shenfa_vectors_textsearch
+                ON tenant_shenfa_vectors
+                USING GIN (textsearchable_index_col)
+            
+2026-05-13 12:27:51,750 - sqlalchemy.engine.Engine - INFO - [generated in 0.00133s] ()
+2026-05-13 12:27:51,753 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_shenfa_vectors_embedding
+                ON tenant_shenfa_vectors
+                USING HNSW (embedding vector_cosine_ops)
+            
+2026-05-13 12:27:51,754 - sqlalchemy.engine.Engine - INFO - [generated in 0.00101s] ()
+2026-05-13 12:27:51,759 - sqlalchemy.engine.Engine - INFO - 
+                CREATE TABLE IF NOT EXISTS tenant_meidi_vectors (
+                    chunk_id TEXT PRIMARY KEY,
+                    content TEXT,
+                    embedding VECTOR(1536),
+                    metadata JSONB DEFAULT '{}',
+                    created_at TIMESTAMP DEFAULT NOW(),
+                    item_code TEXT,
+                    file_name TEXT,
+                    file_path TEXT,
+                    textsearchable_index_col TSVECTOR
+                )
+            
+2026-05-13 12:27:51,759 - sqlalchemy.engine.Engine - INFO - [generated in 0.00073s] ()
+2026-05-13 12:27:51,761 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_meidi_vectors_textsearch
+                ON tenant_meidi_vectors
+                USING GIN (textsearchable_index_col)
+            
+2026-05-13 12:27:51,762 - sqlalchemy.engine.Engine - INFO - [generated in 0.00093s] ()
+2026-05-13 12:27:51,764 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_meidi_vectors_embedding
+                ON tenant_meidi_vectors
+                USING HNSW (embedding vector_cosine_ops)
+            
+2026-05-13 12:27:51,765 - sqlalchemy.engine.Engine - INFO - [generated in 0.00106s] ()
+2026-05-13 12:27:51,767 - sqlalchemy.engine.Engine - INFO - 
+                CREATE TABLE IF NOT EXISTS tenant_dongjiang_vectors (
+                    chunk_id TEXT PRIMARY KEY,
+                    content TEXT,
+                    embedding VECTOR(1536),
+                    metadata JSONB DEFAULT '{}',
+                    created_at TIMESTAMP DEFAULT NOW(),
+                    item_code TEXT,
+                    file_name TEXT,
+                    file_path TEXT,
+                    textsearchable_index_col TSVECTOR
+                )
+            
+2026-05-13 12:27:51,768 - sqlalchemy.engine.Engine - INFO - [generated in 0.00077s] ()
+2026-05-13 12:27:51,769 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_dongjiang_vectors_textsearch
+                ON tenant_dongjiang_vectors
+                USING GIN (textsearchable_index_col)
+            
+2026-05-13 12:27:51,770 - sqlalchemy.engine.Engine - INFO - [generated in 0.00079s] ()
+2026-05-13 12:27:51,772 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_dongjiang_vectors_embedding
+                ON tenant_dongjiang_vectors
+                USING HNSW (embedding vector_cosine_ops)
+            
+2026-05-13 12:27:51,773 - sqlalchemy.engine.Engine - INFO - [generated in 0.00111s] ()
+2026-05-13 12:27:51,775 - sqlalchemy.engine.Engine - INFO - 
+                CREATE TABLE IF NOT EXISTS tenant_huabei_vectors (
+                    chunk_id TEXT PRIMARY KEY,
+                    content TEXT,
+                    embedding VECTOR(1536),
+                    metadata JSONB DEFAULT '{}',
+                    created_at TIMESTAMP DEFAULT NOW(),
+                    item_code TEXT,
+                    file_name TEXT,
+                    file_path TEXT,
+                    textsearchable_index_col TSVECTOR
+                )
+            
+2026-05-13 12:27:51,776 - sqlalchemy.engine.Engine - INFO - [generated in 0.00069s] ()
+2026-05-13 12:27:51,777 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_huabei_vectors_textsearch
+                ON tenant_huabei_vectors
+                USING GIN (textsearchable_index_col)
+            
+2026-05-13 12:27:51,777 - sqlalchemy.engine.Engine - INFO - [generated in 0.00065s] ()
+2026-05-13 12:27:51,780 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_huabei_vectors_embedding
+                ON tenant_huabei_vectors
+                USING HNSW (embedding vector_cosine_ops)
+            
+2026-05-13 12:27:51,782 - sqlalchemy.engine.Engine - INFO - [generated in 0.00215s] ()
+2026-05-13 12:27:51,784 - sqlalchemy.engine.Engine - INFO - COMMIT
+2026-05-13 12:27:51,785 - backend.main - INFO - Database initialized
+2026-05-13 12:27:51,786 - backend.main - INFO - Server running on 0.0.0.0:8000
+2026-05-13 12:29:26,711 - backend.main - INFO - Shutting down...
+2026-05-13 12:29:26,721 - backend.main - INFO - Shutdown complete
+2026-05-13 12:29:34,977 - backend.main - INFO - Starting i3d-agent-system v1.0.0
+2026-05-13 12:29:35,028 - sqlalchemy.engine.Engine - INFO - select pg_catalog.version()
+2026-05-13 12:29:35,029 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2026-05-13 12:29:35,034 - sqlalchemy.engine.Engine - INFO - select current_schema()
+2026-05-13 12:29:35,035 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2026-05-13 12:29:35,038 - sqlalchemy.engine.Engine - INFO - show standard_conforming_strings
+2026-05-13 12:29:35,039 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2026-05-13 12:29:35,041 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2026-05-13 12:29:35,043 - sqlalchemy.engine.Engine - INFO - CREATE EXTENSION IF NOT EXISTS vector
+2026-05-13 12:29:35,043 - sqlalchemy.engine.Engine - INFO - [generated in 0.00070s] ()
+2026-05-13 12:29:35,045 - sqlalchemy.engine.Engine - INFO - CREATE EXTENSION IF NOT EXISTS "uuid-ossp"
+2026-05-13 12:29:35,046 - sqlalchemy.engine.Engine - INFO - [generated in 0.00103s] ()
+2026-05-13 12:29:35,050 - sqlalchemy.engine.Engine - INFO - 
+            CREATE TABLE IF NOT EXISTS chat_history (
+                id SERIAL PRIMARY KEY,
+                session_id TEXT NOT NULL,
+                tenant_id TEXT NOT NULL,
+                role TEXT NOT NULL,
+                content TEXT NOT NULL,
+                metadata JSONB DEFAULT '{}',
+                created_at TIMESTAMP DEFAULT NOW()
+            )
+        
+2026-05-13 12:29:35,050 - sqlalchemy.engine.Engine - INFO - [generated in 0.00090s] ()
+2026-05-13 12:29:35,053 - sqlalchemy.engine.Engine - INFO - 
+                CREATE TABLE IF NOT EXISTS tenant_shenfa_vectors (
+                    chunk_id TEXT PRIMARY KEY,
+                    content TEXT,
+                    embedding VECTOR(1536),
+                    metadata JSONB DEFAULT '{}',
+                    created_at TIMESTAMP DEFAULT NOW(),
+                    item_code TEXT,
+                    file_name TEXT,
+                    file_path TEXT,
+                    textsearchable_index_col TSVECTOR
+                )
+            
+2026-05-13 12:29:35,054 - sqlalchemy.engine.Engine - INFO - [generated in 0.00092s] ()
+2026-05-13 12:29:35,056 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_shenfa_vectors_textsearch
+                ON tenant_shenfa_vectors
+                USING GIN (textsearchable_index_col)
+            
+2026-05-13 12:29:35,056 - sqlalchemy.engine.Engine - INFO - [generated in 0.00064s] ()
+2026-05-13 12:29:35,058 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_shenfa_vectors_embedding
+                ON tenant_shenfa_vectors
+                USING HNSW (embedding vector_cosine_ops)
+            
+2026-05-13 12:29:35,059 - sqlalchemy.engine.Engine - INFO - [generated in 0.00065s] ()
+2026-05-13 12:29:35,062 - sqlalchemy.engine.Engine - INFO - 
+                CREATE TABLE IF NOT EXISTS tenant_meidi_vectors (
+                    chunk_id TEXT PRIMARY KEY,
+                    content TEXT,
+                    embedding VECTOR(1536),
+                    metadata JSONB DEFAULT '{}',
+                    created_at TIMESTAMP DEFAULT NOW(),
+                    item_code TEXT,
+                    file_name TEXT,
+                    file_path TEXT,
+                    textsearchable_index_col TSVECTOR
+                )
+            
+2026-05-13 12:29:35,063 - sqlalchemy.engine.Engine - INFO - [generated in 0.00067s] ()
+2026-05-13 12:29:35,064 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_meidi_vectors_textsearch
+                ON tenant_meidi_vectors
+                USING GIN (textsearchable_index_col)
+            
+2026-05-13 12:29:35,065 - sqlalchemy.engine.Engine - INFO - [generated in 0.00057s] ()
+2026-05-13 12:29:35,066 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_meidi_vectors_embedding
+                ON tenant_meidi_vectors
+                USING HNSW (embedding vector_cosine_ops)
+            
+2026-05-13 12:29:35,067 - sqlalchemy.engine.Engine - INFO - [generated in 0.00062s] ()
+2026-05-13 12:29:35,069 - sqlalchemy.engine.Engine - INFO - 
+                CREATE TABLE IF NOT EXISTS tenant_dongjiang_vectors (
+                    chunk_id TEXT PRIMARY KEY,
+                    content TEXT,
+                    embedding VECTOR(1536),
+                    metadata JSONB DEFAULT '{}',
+                    created_at TIMESTAMP DEFAULT NOW(),
+                    item_code TEXT,
+                    file_name TEXT,
+                    file_path TEXT,
+                    textsearchable_index_col TSVECTOR
+                )
+            
+2026-05-13 12:29:35,069 - sqlalchemy.engine.Engine - INFO - [generated in 0.00062s] ()
+2026-05-13 12:29:35,071 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_dongjiang_vectors_textsearch
+                ON tenant_dongjiang_vectors
+                USING GIN (textsearchable_index_col)
+            
+2026-05-13 12:29:35,071 - sqlalchemy.engine.Engine - INFO - [generated in 0.00057s] ()
+2026-05-13 12:29:35,073 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_dongjiang_vectors_embedding
+                ON tenant_dongjiang_vectors
+                USING HNSW (embedding vector_cosine_ops)
+            
+2026-05-13 12:29:35,074 - sqlalchemy.engine.Engine - INFO - [generated in 0.00075s] ()
+2026-05-13 12:29:35,075 - sqlalchemy.engine.Engine - INFO - 
+                CREATE TABLE IF NOT EXISTS tenant_huabei_vectors (
+                    chunk_id TEXT PRIMARY KEY,
+                    content TEXT,
+                    embedding VECTOR(1536),
+                    metadata JSONB DEFAULT '{}',
+                    created_at TIMESTAMP DEFAULT NOW(),
+                    item_code TEXT,
+                    file_name TEXT,
+                    file_path TEXT,
+                    textsearchable_index_col TSVECTOR
+                )
+            
+2026-05-13 12:29:35,076 - sqlalchemy.engine.Engine - INFO - [generated in 0.00075s] ()
+2026-05-13 12:29:35,078 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_huabei_vectors_textsearch
+                ON tenant_huabei_vectors
+                USING GIN (textsearchable_index_col)
+            
+2026-05-13 12:29:35,078 - sqlalchemy.engine.Engine - INFO - [generated in 0.00068s] ()
+2026-05-13 12:29:35,080 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_huabei_vectors_embedding
+                ON tenant_huabei_vectors
+                USING HNSW (embedding vector_cosine_ops)
+            
+2026-05-13 12:29:35,082 - sqlalchemy.engine.Engine - INFO - [generated in 0.00189s] ()
+2026-05-13 12:29:35,084 - sqlalchemy.engine.Engine - INFO - COMMIT
+2026-05-13 12:29:35,085 - backend.main - INFO - Database initialized
+2026-05-13 12:29:35,086 - backend.main - INFO - Server running on 0.0.0.0:8000
+2026-05-13 12:30:31,319 - backend.main - INFO - Shutting down...
+2026-05-13 12:30:31,325 - backend.main - INFO - Shutdown complete
+2026-05-13 12:30:39,180 - backend.main - INFO - Starting i3d-agent-system v1.0.0
+2026-05-13 12:30:39,232 - sqlalchemy.engine.Engine - INFO - select pg_catalog.version()
+2026-05-13 12:30:39,234 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2026-05-13 12:30:39,240 - sqlalchemy.engine.Engine - INFO - select current_schema()
+2026-05-13 12:30:39,241 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2026-05-13 12:30:39,245 - sqlalchemy.engine.Engine - INFO - show standard_conforming_strings
+2026-05-13 12:30:39,246 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2026-05-13 12:30:39,251 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2026-05-13 12:30:39,253 - sqlalchemy.engine.Engine - INFO - CREATE EXTENSION IF NOT EXISTS vector
+2026-05-13 12:30:39,254 - sqlalchemy.engine.Engine - INFO - [generated in 0.00115s] ()
+2026-05-13 12:30:39,257 - sqlalchemy.engine.Engine - INFO - CREATE EXTENSION IF NOT EXISTS "uuid-ossp"
+2026-05-13 12:30:39,258 - sqlalchemy.engine.Engine - INFO - [generated in 0.00112s] ()
+2026-05-13 12:30:39,260 - sqlalchemy.engine.Engine - INFO - 
+            CREATE TABLE IF NOT EXISTS chat_history (
+                id SERIAL PRIMARY KEY,
+                session_id TEXT NOT NULL,
+                tenant_id TEXT NOT NULL,
+                role TEXT NOT NULL,
+                content TEXT NOT NULL,
+                metadata JSONB DEFAULT '{}',
+                created_at TIMESTAMP DEFAULT NOW()
+            )
+        
+2026-05-13 12:30:39,261 - sqlalchemy.engine.Engine - INFO - [generated in 0.00096s] ()
+2026-05-13 12:30:39,263 - sqlalchemy.engine.Engine - INFO - 
+                CREATE TABLE IF NOT EXISTS tenant_shenfa_vectors (
+                    chunk_id TEXT PRIMARY KEY,
+                    content TEXT,
+                    embedding VECTOR(1536),
+                    metadata JSONB DEFAULT '{}',
+                    created_at TIMESTAMP DEFAULT NOW(),
+                    item_code TEXT,
+                    file_name TEXT,
+                    file_path TEXT,
+                    textsearchable_index_col TSVECTOR
+                )
+            
+2026-05-13 12:30:39,264 - sqlalchemy.engine.Engine - INFO - [generated in 0.00079s] ()
+2026-05-13 12:30:39,266 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_shenfa_vectors_textsearch
+                ON tenant_shenfa_vectors
+                USING GIN (textsearchable_index_col)
+            
+2026-05-13 12:30:39,266 - sqlalchemy.engine.Engine - INFO - [generated in 0.00068s] ()
+2026-05-13 12:30:39,268 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_shenfa_vectors_embedding
+                ON tenant_shenfa_vectors
+                USING HNSW (embedding vector_cosine_ops)
+            
+2026-05-13 12:30:39,269 - sqlalchemy.engine.Engine - INFO - [generated in 0.00079s] ()
+2026-05-13 12:30:39,271 - sqlalchemy.engine.Engine - INFO - 
+                CREATE TABLE IF NOT EXISTS tenant_meidi_vectors (
+                    chunk_id TEXT PRIMARY KEY,
+                    content TEXT,
+                    embedding VECTOR(1536),
+                    metadata JSONB DEFAULT '{}',
+                    created_at TIMESTAMP DEFAULT NOW(),
+                    item_code TEXT,
+                    file_name TEXT,
+                    file_path TEXT,
+                    textsearchable_index_col TSVECTOR
+                )
+            
+2026-05-13 12:30:39,272 - sqlalchemy.engine.Engine - INFO - [generated in 0.00071s] ()
+2026-05-13 12:30:39,273 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_meidi_vectors_textsearch
+                ON tenant_meidi_vectors
+                USING GIN (textsearchable_index_col)
+            
+2026-05-13 12:30:39,274 - sqlalchemy.engine.Engine - INFO - [generated in 0.00060s] ()
+2026-05-13 12:30:39,275 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_meidi_vectors_embedding
+                ON tenant_meidi_vectors
+                USING HNSW (embedding vector_cosine_ops)
+            
+2026-05-13 12:30:39,276 - sqlalchemy.engine.Engine - INFO - [generated in 0.00057s] ()
+2026-05-13 12:30:39,277 - sqlalchemy.engine.Engine - INFO - 
+                CREATE TABLE IF NOT EXISTS tenant_dongjiang_vectors (
+                    chunk_id TEXT PRIMARY KEY,
+                    content TEXT,
+                    embedding VECTOR(1536),
+                    metadata JSONB DEFAULT '{}',
+                    created_at TIMESTAMP DEFAULT NOW(),
+                    item_code TEXT,
+                    file_name TEXT,
+                    file_path TEXT,
+                    textsearchable_index_col TSVECTOR
+                )
+            
+2026-05-13 12:30:39,278 - sqlalchemy.engine.Engine - INFO - [generated in 0.00070s] ()
+2026-05-13 12:30:39,279 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_dongjiang_vectors_textsearch
+                ON tenant_dongjiang_vectors
+                USING GIN (textsearchable_index_col)
+            
+2026-05-13 12:30:39,280 - sqlalchemy.engine.Engine - INFO - [generated in 0.00072s] ()
+2026-05-13 12:30:39,282 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_dongjiang_vectors_embedding
+                ON tenant_dongjiang_vectors
+                USING HNSW (embedding vector_cosine_ops)
+            
+2026-05-13 12:30:39,283 - sqlalchemy.engine.Engine - INFO - [generated in 0.00149s] ()
+2026-05-13 12:30:39,286 - sqlalchemy.engine.Engine - INFO - 
+                CREATE TABLE IF NOT EXISTS tenant_huabei_vectors (
+                    chunk_id TEXT PRIMARY KEY,
+                    content TEXT,
+                    embedding VECTOR(1536),
+                    metadata JSONB DEFAULT '{}',
+                    created_at TIMESTAMP DEFAULT NOW(),
+                    item_code TEXT,
+                    file_name TEXT,
+                    file_path TEXT,
+                    textsearchable_index_col TSVECTOR
+                )
+            
+2026-05-13 12:30:39,286 - sqlalchemy.engine.Engine - INFO - [generated in 0.00067s] ()
+2026-05-13 12:30:39,288 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_huabei_vectors_textsearch
+                ON tenant_huabei_vectors
+                USING GIN (textsearchable_index_col)
+            
+2026-05-13 12:30:39,288 - sqlalchemy.engine.Engine - INFO - [generated in 0.00051s] ()
+2026-05-13 12:30:39,290 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_huabei_vectors_embedding
+                ON tenant_huabei_vectors
+                USING HNSW (embedding vector_cosine_ops)
+            
+2026-05-13 12:30:39,290 - sqlalchemy.engine.Engine - INFO - [generated in 0.00061s] ()
+2026-05-13 12:30:39,292 - sqlalchemy.engine.Engine - INFO - COMMIT
+2026-05-13 12:30:39,292 - backend.main - INFO - Database initialized
+2026-05-13 12:30:39,293 - backend.main - INFO - Server running on 0.0.0.0:8000
+2026-05-13 12:31:38,901 - openai._base_client - INFO - Retrying request to /embeddings in 0.496463 seconds
+2026-05-13 12:31:39,406 - openai._base_client - INFO - Retrying request to /embeddings in 0.960638 seconds
+2026-05-13 12:31:40,475 - openai._base_client - INFO - Retrying request to /embeddings in 0.378473 seconds
+2026-05-13 12:31:40,860 - openai._base_client - INFO - Retrying request to /embeddings in 0.934522 seconds
+2026-05-13 12:32:27,006 - backend.main - INFO - Shutting down...
+2026-05-13 12:32:27,018 - backend.main - INFO - Shutdown complete
+2026-05-13 12:32:27,026 - aio_pika.robust_connection - INFO - Connection to amqp://guest:******@rabbitmq:5672/ closed. Reconnecting after 5 seconds.
+2026-05-13 12:32:35,960 - backend.main - INFO - Starting i3d-agent-system v1.0.0
+2026-05-13 12:32:36,033 - sqlalchemy.engine.Engine - INFO - select pg_catalog.version()
+2026-05-13 12:32:36,034 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2026-05-13 12:32:36,037 - sqlalchemy.engine.Engine - INFO - select current_schema()
+2026-05-13 12:32:36,038 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2026-05-13 12:32:36,041 - sqlalchemy.engine.Engine - INFO - show standard_conforming_strings
+2026-05-13 12:32:36,042 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2026-05-13 12:32:36,045 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2026-05-13 12:32:36,047 - sqlalchemy.engine.Engine - INFO - CREATE EXTENSION IF NOT EXISTS vector
+2026-05-13 12:32:36,048 - sqlalchemy.engine.Engine - INFO - [generated in 0.00108s] ()
+2026-05-13 12:32:36,053 - sqlalchemy.engine.Engine - INFO - CREATE EXTENSION IF NOT EXISTS "uuid-ossp"
+2026-05-13 12:32:36,054 - sqlalchemy.engine.Engine - INFO - [generated in 0.00136s] ()
+2026-05-13 12:32:36,058 - sqlalchemy.engine.Engine - INFO - 
+            CREATE TABLE IF NOT EXISTS chat_history (
+                id SERIAL PRIMARY KEY,
+                session_id TEXT NOT NULL,
+                tenant_id TEXT NOT NULL,
+                role TEXT NOT NULL,
+                content TEXT NOT NULL,
+                metadata JSONB DEFAULT '{}',
+                created_at TIMESTAMP DEFAULT NOW()
+            )
+        
+2026-05-13 12:32:36,059 - sqlalchemy.engine.Engine - INFO - [generated in 0.00116s] ()
+2026-05-13 12:32:36,061 - sqlalchemy.engine.Engine - INFO - 
+                CREATE TABLE IF NOT EXISTS tenant_shenfa_vectors (
+                    chunk_id TEXT PRIMARY KEY,
+                    content TEXT,
+                    embedding VECTOR(1536),
+                    metadata JSONB DEFAULT '{}',
+                    created_at TIMESTAMP DEFAULT NOW(),
+                    item_code TEXT,
+                    file_name TEXT,
+                    file_path TEXT,
+                    textsearchable_index_col TSVECTOR
+                )
+            
+2026-05-13 12:32:36,063 - sqlalchemy.engine.Engine - INFO - [generated in 0.00115s] ()
+2026-05-13 12:32:36,065 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_shenfa_vectors_textsearch
+                ON tenant_shenfa_vectors
+                USING GIN (textsearchable_index_col)
+            
+2026-05-13 12:32:36,067 - sqlalchemy.engine.Engine - INFO - [generated in 0.00133s] ()
+2026-05-13 12:32:36,071 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_shenfa_vectors_embedding
+                ON tenant_shenfa_vectors
+                USING HNSW (embedding vector_cosine_ops)
+            
+2026-05-13 12:32:36,073 - sqlalchemy.engine.Engine - INFO - [generated in 0.00171s] ()
+2026-05-13 12:32:36,078 - sqlalchemy.engine.Engine - INFO - 
+                CREATE TABLE IF NOT EXISTS tenant_meidi_vectors (
+                    chunk_id TEXT PRIMARY KEY,
+                    content TEXT,
+                    embedding VECTOR(1536),
+                    metadata JSONB DEFAULT '{}',
+                    created_at TIMESTAMP DEFAULT NOW(),
+                    item_code TEXT,
+                    file_name TEXT,
+                    file_path TEXT,
+                    textsearchable_index_col TSVECTOR
+                )
+            
+2026-05-13 12:32:36,079 - sqlalchemy.engine.Engine - INFO - [generated in 0.00116s] ()
+2026-05-13 12:32:36,082 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_meidi_vectors_textsearch
+                ON tenant_meidi_vectors
+                USING GIN (textsearchable_index_col)
+            
+2026-05-13 12:32:36,084 - sqlalchemy.engine.Engine - INFO - [generated in 0.00180s] ()
+2026-05-13 12:32:36,088 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_meidi_vectors_embedding
+                ON tenant_meidi_vectors
+                USING HNSW (embedding vector_cosine_ops)
+            
+2026-05-13 12:32:36,089 - sqlalchemy.engine.Engine - INFO - [generated in 0.00113s] ()
+2026-05-13 12:32:36,091 - sqlalchemy.engine.Engine - INFO - 
+                CREATE TABLE IF NOT EXISTS tenant_dongjiang_vectors (
+                    chunk_id TEXT PRIMARY KEY,
+                    content TEXT,
+                    embedding VECTOR(1536),
+                    metadata JSONB DEFAULT '{}',
+                    created_at TIMESTAMP DEFAULT NOW(),
+                    item_code TEXT,
+                    file_name TEXT,
+                    file_path TEXT,
+                    textsearchable_index_col TSVECTOR
+                )
+            
+2026-05-13 12:32:36,092 - sqlalchemy.engine.Engine - INFO - [generated in 0.00088s] ()
+2026-05-13 12:32:36,095 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_dongjiang_vectors_textsearch
+                ON tenant_dongjiang_vectors
+                USING GIN (textsearchable_index_col)
+            
+2026-05-13 12:32:36,096 - sqlalchemy.engine.Engine - INFO - [generated in 0.00087s] ()
+2026-05-13 12:32:36,098 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_dongjiang_vectors_embedding
+                ON tenant_dongjiang_vectors
+                USING HNSW (embedding vector_cosine_ops)
+            
+2026-05-13 12:32:36,099 - sqlalchemy.engine.Engine - INFO - [generated in 0.00098s] ()
+2026-05-13 12:32:36,102 - sqlalchemy.engine.Engine - INFO - 
+                CREATE TABLE IF NOT EXISTS tenant_huabei_vectors (
+                    chunk_id TEXT PRIMARY KEY,
+                    content TEXT,
+                    embedding VECTOR(1536),
+                    metadata JSONB DEFAULT '{}',
+                    created_at TIMESTAMP DEFAULT NOW(),
+                    item_code TEXT,
+                    file_name TEXT,
+                    file_path TEXT,
+                    textsearchable_index_col TSVECTOR
+                )
+            
+2026-05-13 12:32:36,102 - sqlalchemy.engine.Engine - INFO - [generated in 0.00091s] ()
+2026-05-13 12:32:36,105 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_huabei_vectors_textsearch
+                ON tenant_huabei_vectors
+                USING GIN (textsearchable_index_col)
+            
+2026-05-13 12:32:36,105 - sqlalchemy.engine.Engine - INFO - [generated in 0.00090s] ()
+2026-05-13 12:32:36,107 - sqlalchemy.engine.Engine - INFO - 
+                CREATE INDEX IF NOT EXISTS idx_tenant_huabei_vectors_embedding
+                ON tenant_huabei_vectors
+                USING HNSW (embedding vector_cosine_ops)
+            
+2026-05-13 12:32:36,108 - sqlalchemy.engine.Engine - INFO - [generated in 0.00088s] ()
+2026-05-13 12:32:36,110 - sqlalchemy.engine.Engine - INFO - COMMIT
+2026-05-13 12:32:36,112 - backend.main - INFO - Database initialized
+2026-05-13 12:32:36,112 - backend.main - INFO - Server running on 0.0.0.0:8000
+2026-05-13 12:32:38,640 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2026-05-13 12:32:38,641 - sqlalchemy.engine.Engine - INFO - SELECT 1
+2026-05-13 12:32:38,642 - sqlalchemy.engine.Engine - INFO - [generated in 0.00249s] ()
+2026-05-13 12:32:38,647 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2026-05-13 12:32:52,630 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2026-05-13 12:32:52,631 - sqlalchemy.engine.Engine - INFO - SELECT 1
+2026-05-13 12:32:52,632 - sqlalchemy.engine.Engine - INFO - [cached since 13.99s ago] ()
+2026-05-13 12:32:52,633 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2026-05-13 12:33:00,746 - openai._base_client - INFO - Retrying request to /embeddings in 0.392494 seconds
+2026-05-13 12:33:01,148 - openai._base_client - INFO - Retrying request to /embeddings in 0.763679 seconds
+2026-05-13 12:36:50,445 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2026-05-13 12:36:50,447 - sqlalchemy.engine.Engine - INFO - SELECT 1
+2026-05-13 12:36:50,448 - sqlalchemy.engine.Engine - INFO - [cached since 251.8s ago] ()
+2026-05-13 12:36:50,451 - sqlalchemy.engine.Engine - INFO - ROLLBACK

@@ -15,8 +15,8 @@ class Settings(BaseSettings):
     # 应用基础配置
     APP_NAME: str = "i3d-agent-system"
     APP_VERSION: str = "1.0.0"
-    DEBUG: bool = False
-    ENVIRONMENT: str = Field(default="development", regex="^(development|staging|production)$")
+    DEBUG: bool = True
+    ENVIRONMENT: str = Field(default="development", pattern="^(development|staging|production)$")
 
     # 服务配置
     HOST: str = "0.0.0.0"

@@ -8,7 +8,6 @@ import uuid
 
 from langchain_core.messages import AIMessage, HumanMessage
 
-from ..graph.workflow import get_agent_workflow
 from ..models.schema import (
     ChatRequest,
     AgentResponse,
@@ -34,6 +33,7 @@ class AgentController:
     """
 
     def __init__(self):
+        from ..graph.workflow import get_agent_workflow
         self.workflow = get_agent_workflow()
 
     async def process_request(
@@ -180,7 +180,7 @@ class AgentController:
             response_type=ResponseType(state.get("response_type", "answer")),
             intent=IntentType(state.get("intent", "unknown")),
             intent_confidence=state.get("intent_confidence", 0.0),
-            agent_used=AgentType(state.get("active_agent", "qa_agent")),
+            agent_used=AgentType(state.get("active_agent") or "qa_agent"),
             tool_calls=tool_calls,
             search_results=state.get("search_results", []),
             llm_calls=llm_calls,

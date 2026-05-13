@@ -26,6 +26,7 @@ langchain-openai==0.2.5
 langchain-anthropic==0.2.3
 langchain-community==0.3.5
 langgraph==0.2.45
+langgraph-checkpoint-postgres==2.0.0
 
 # 向量数据库
 pgvector==0.3.4
