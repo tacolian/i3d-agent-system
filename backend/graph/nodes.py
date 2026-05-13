@@ -11,6 +11,7 @@ from ..agents.search_agent import SearchAgent
 from ..agents.analysis_agent import AnalysisAgent
 from ..agents.recommendation_agent import RecommendationAgent
 from ..agents.qa_agent import QAAgent
+from ..agents.base import AgentInput
 from ..config import settings
 
 
@@ -141,9 +142,12 @@ async def search_node(state: AgentState) -> AgentState:
 
     agent = SearchAgent()
     result = await agent.execute(
-        query=state["user_input"],
-        tenant_id=state["tenant_id"],
-        search_results=state["search_results"],
+        AgentInput(
+            query=state["user_input"],
+            tenant_id=state["tenant_id"],
+            session_id=state["session_id"],
+            search_results=state["search_results"],
+        )
     )
 
     state["agent_outputs"]["search"] = result["response"]
@@ -166,9 +170,12 @@ async def analysis_node(state: AgentState) -> AgentState:
 
     agent = AnalysisAgent()
     result = await agent.execute(
-        query=state["user_input"],
-        tenant_id=state["tenant_id"],
-        search_results=state["search_results"],
+        AgentInput(
+            query=state["user_input"],
+            tenant_id=state["tenant_id"],
+            session_id=state["session_id"],
+            search_results=state["search_results"],
+        )
     )
 
     state["agent_outputs"]["analysis"] = result["response"]
@@ -190,9 +197,12 @@ async def recommendation_node(state: AgentState) -> AgentState:
 
     agent = RecommendationAgent()
     result = await agent.execute(
-        query=state["user_input"],
-        tenant_id=state["tenant_id"],
-        search_results=state["search_results"],
+        AgentInput(
+            query=state["user_input"],
+            tenant_id=state["tenant_id"],
+            session_id=state["session_id"],
+            search_results=state["search_results"],
+        )
     )
 
     state["agent_outputs"]["recommendation"] = result["response"]
@@ -215,10 +225,13 @@ async def qa_node(state: AgentState) -> AgentState:
 
     agent = QAAgent()
     result = await agent.execute(
-        query=state["user_input"],
-        tenant_id=state["tenant_id"],
-        search_results=state["search_results"],
-        context=state["retrieval_context"],
+        AgentInput(
+            query=state["user_input"],
+            tenant_id=state["tenant_id"],
+            session_id=state["session_id"],
+            search_results=state["search_results"],
+            context=state["retrieval_context"],
+        )
     )
 
     state["agent_outputs"]["qa"] = result["response"]

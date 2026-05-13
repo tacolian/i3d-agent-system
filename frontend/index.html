@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>I3D · 3D CAD 智能检索 Agent 系统</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@300;400;500;600&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css?v=lightblue2">
+</head>
+<body>
+    <!-- 噪点纹理层 -->
+    <div class="noise-overlay"></div>
+    <div class="scanlines"></div>
+
+    <!-- 租户选择覆盖层 -->
+    <div id="tenant-overlay" class="tenant-overlay">
+        <div class="tenant-panel">
+            <div class="tenant-brand">
+                <div class="brand-mark">I3D</div>
+                <h1 class="brand-title">3D CAD 智能检索<br>Agent 系统</h1>
+                <p class="brand-subtitle">Industrial Intelligence · Design Discovery</p>
+            </div>
+            <div class="tenant-divider">
+                <span></span>
+                <em>选择工作租户</em>
+                <span></span>
+            </div>
+            <div class="tenant-grid">
+                <button class="tenant-card" data-tenant="shenfa">
+                    <div class="tenant-icon">▣</div>
+                    <div class="tenant-name">申发</div>
+                    <div class="tenant-code">SHENFA</div>
+                </button>
+                <button class="tenant-card" data-tenant="meidi">
+                    <div class="tenant-icon">◈</div>
+                    <div class="tenant-name">美的</div>
+                    <div class="tenant-code">MEIDI</div>
+                </button>
+                <button class="tenant-card" data-tenant="dongjiang">
+                    <div class="tenant-icon">◉</div>
+                    <div class="tenant-name">东江</div>
+                    <div class="tenant-code">DONGJIANG</div>
+                </button>
+                <button class="tenant-card" data-tenant="huabei">
+                    <div class="tenant-icon">◆</div>
+                    <div class="tenant-name">华北</div>
+                    <div class="tenant-code">HUABEI</div>
+                </button>
+            </div>
+            <div class="tenant-hint">
+                <span class="hint-dot"></span>
+                租户选择后将建立隔离的数据会话
+            </div>
+        </div>
+    </div>
+
+    <!-- 主应用界面 -->
+    <div id="app" class="app hidden">
+        <!-- 顶部栏 -->
+        <header class="app-header">
+            <div class="header-left">
+                <div class="logo-mark">I3D</div>
+                <div class="header-divider"></div>
+                <nav class="header-nav">
+                    <button class="nav-item active" data-view="chat">
+                        <span class="nav-icon">⌘</span>
+                        <span>智能对话</span>
+                    </button>
+                    <button class="nav-item" data-view="upload">
+                        <span class="nav-icon">▤</span>
+                        <span>文档上传</span>
+                    </button>
+                    <button class="nav-item" data-view="status">
+                        <span class="nav-icon">◍</span>
+                        <span>系统状态</span>
+                    </button>
+                </nav>
+            </div>
+            <div class="header-right">
+                <div class="tenant-badge">
+                    <span class="badge-indicator" id="status-indicator"></span>
+                    <span class="badge-label" id="current-tenant">未选择</span>
+                </div>
+                <button class="header-action" id="btn-settings" title="设置">
+                    <span>☰</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- 主内容区 -->
+        <main class="app-main">
+            <!-- 聊天视图 -->
+            <div id="view-chat" class="view view-chat active">
+                <div class="chat-container">
+                    <div class="chat-sidebar">
+                        <div class="sidebar-section">
+                            <h3 class="sidebar-title">会话历史</h3>
+                            <button class="btn-new-chat" id="btn-new-chat">
+                                <span>+</span> 新会话
+                            </button>
+                            <div class="session-list" id="session-list">
+                                <!-- 动态生成 -->
+                            </div>
+                        </div>
+                        <div class="sidebar-section sidebar-bottom">
+                            <h3 class="sidebar-title">快捷操作</h3>
+                            <div class="quick-actions">
+                                <button class="quick-btn" data-prompt="查找所有直径大于50mm的轴承模型">
+                                    🔍 轴承检索
+                                </button>
+                                <button class="quick-btn" data-prompt="分析最近上传的齿轮箱装配体">
+                                    📐 装配分析
+                                </button>
+                                <button class="quick-btn" data-prompt="推荐与当前模型相似的标准件">
+                                    ✦ 相似推荐
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chat-main">
+                        <div class="chat-messages" id="chat-messages">
+                            <div class="welcome-screen" id="welcome-screen">
+                                <div class="welcome-content">
+                                    <div class="welcome-mark">I3D</div>
+                                    <h2 class="welcome-title">CAD 智能检索 Agent</h2>
+                                    <p class="welcome-desc">
+                                        基于多 Agent 协作与 RAG 技术，提供 3D 模型的<br>
+                                        智能检索、分析、推荐与问答服务
+                                    </p>
+                                    <div class="welcome-capabilities">
+                                        <div class="capability">
+                                            <div class="cap-icon">◈</div>
+                                            <div class="cap-text">混合检索</div>
+                                        </div>
+                                        <div class="capability">
+                                            <div class="cap-icon">◉</div>
+                                            <div class="cap-text">智能分析</div>
+                                        </div>
+                                        <div class="capability">
+                                            <div class="cap-icon">▣</div>
+                                            <div class="cap-text">流式响应</div>
+                                        </div>
+                                        <div class="capability">
+                                            <div class="cap-icon">◆</div>
+                                            <div class="cap-text">多租户隔离</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chat-input-area">
+                            <div class="input-toolbar">
+                                <label class="toolbar-btn" title="上传文件">
+                                    <input type="file" id="chat-file-input" hidden accept=".txt,.md,.pdf,.doc,.docx,.xls,.xlsx">
+                                    <span>▤</span> 附件
+                                </label>
+                                <button class="toolbar-btn" id="btn-clear" title="清空对话">
+                                    <span>⌫</span> 清空
+                                </button>
+                                <button class="toolbar-btn" id="btn-stream-toggle" title="切换流式响应">
+                                    <span class="stream-indicator active" id="stream-indicator">●</span> 流式
+                                </button>
+                            </div>
+                            <div class="input-wrapper">
+                                <textarea 
+                                    id="chat-input" 
+                                    class="chat-input" 
+                                    placeholder="输入您的问题，例如：查找所有直径大于 50mm 的轴承模型..."
+                                    rows="1"
+                                ></textarea>
+                                <button class="send-btn" id="btn-send">
+                                    <span>→</span>
+                                </button>
+                            </div>
+                            <div class="input-hint">
+                                <span id="file-name"></span>
+                                <span class="hint-text">Enter 发送 · Shift+Enter 换行</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 上传视图 -->
+            <div id="view-upload" class="view view-upload">
+                <div class="upload-container">
+                    <div class="upload-header">
+                        <h2 class="section-title">文档上传</h2>
+                        <p class="section-desc">上传文档以构建 RAG 知识库，支持文本、PDF、Word、Excel 格式</p>
+                    </div>
+                    <div class="upload-dropzone" id="dropzone">
+                        <div class="dropzone-inner">
+                            <div class="dropzone-icon">▤</div>
+                            <p class="dropzone-text">拖拽文件到此处，或点击选择</p>
+                            <p class="dropzone-hint">支持 .txt .md .pdf .doc .docx .xls .xlsx · 单文件最大 10MB</p>
+                            <input type="file" id="upload-input" hidden accept=".txt,.md,.pdf,.doc,.docx,.xls,.xlsx" multiple>
+                            <button class="btn-select-file">选择文件</button>
+                        </div>
+                    </div>
+                    <div class="upload-results" id="upload-results">
+                        <!-- 上传结果动态显示 -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 状态视图 -->
+            <div id="view-status" class="view view-status">
+                <div class="status-container">
+                    <div class="status-header">
+                        <h2 class="section-title">系统状态</h2>
+                        <p class="section-desc">实时监控后端服务与依赖组件健康状态</p>
+                    </div>
+                    <div class="status-grid" id="status-grid">
+                        <!-- 动态生成 -->
+                    </div>
+                    <div class="status-metrics">
+                        <h3 class="metrics-title">API 信息</h3>
+                        <div class="metrics-table">
+                            <div class="metric-row">
+                                <span class="metric-key">API 地址</span>
+                                <span class="metric-value" id="api-base-url">/</span>
+                            </div>
+                            <div class="metric-row">
+                                <span class="metric-key">当前租户</span>
+                                <span class="metric-value" id="status-tenant">-</span>
+                            </div>
+                            <div class="metric-row">
+                                <span class="metric-key">会话 ID</span>
+                                <span class="metric-value mono" id="status-session">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 设置面板 -->
+    <div id="settings-panel" class="settings-panel">
+        <div class="settings-backdrop"></div>
+        <div class="settings-content">
+            <div class="settings-header">
+                <h3>设置</h3>
+                <button class="btn-close" id="btn-close-settings">×</button>
+            </div>
+            <div class="settings-body">
+                <div class="setting-item">
+                    <label>API 基础地址</label>
+                    <input type="text" id="setting-api-url" value="" placeholder="http://localhost:8000">
+                </div>
+                <div class="setting-item">
+                    <label>用户 ID</label>
+                    <input type="text" id="setting-user-id" value="" placeholder="可选">
+                </div>
+                <div class="setting-item">
+                    <label>最大结果数</label>
+                    <input type="number" id="setting-max-results" value="10" min="1" max="50">
+                </div>
+                <div class="setting-item">
+                    <label>生成温度</label>
+                    <input type="range" id="setting-temperature" min="0" max="1" step="0.1" value="0.7">
+                    <span class="range-value" id="temp-value">0.7</span>
+                </div>
+                <div class="setting-item">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="setting-rag" checked>
+                        <span>启用 RAG 检索</span>
+                    </label>
+                </div>
+            </div>
+            <div class="settings-footer">
+                <button class="btn-primary" id="btn-save-settings">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!--  toast 提示 -->
+    <div id="toast" class="toast"></div>
+
+    <script src="js/app.js?v=lightblue2"></script>
+</body>
+</html>

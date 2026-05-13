@@ -16,6 +16,7 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
       - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_BASE_URL=${OPENAI_BASE_URL}
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
       - LANGCHAIN_API_KEY=${LANGCHAIN_API_KEY}
     depends_on:
@@ -27,6 +28,20 @@ services:
     restart: unless-stopped
     volumes:
       - ../logs:/app/logs
+
+  # 前端服务
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: i3d-frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - agent-api
+    networks:
+      - i3d-network
+    restart: unless-stopped
 
   # PostgreSQL数据库
   postgres:

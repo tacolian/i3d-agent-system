@@ -42,15 +42,15 @@ class LLMRouter:
     MODELS = {
         ModelTier.FAST: {
             "anthropic": "claude-haiku-4-20250123",
-            "openai": "gpt-4o-mini",
+            "openai": "kimi-for-coding",
         },
         ModelTier.BALANCED: {
             "anthropic": "claude-sonnet-4-20250514",
-            "openai": "gpt-4o",
+            "openai": "kimi-for-coding",
         },
         ModelTier.COMPLEX: {
             "anthropic": "claude-opus-4-20250514",
-            "openai": "gpt-4-turbo",
+            "openai": "kimi-for-coding",
         },
     }
 
@@ -65,8 +65,12 @@ class LLMRouter:
     }
 
     def __init__(self):
-        self.provider = "anthropic"  # 默认使用Anthropic
-        self.cost_sensitivity = settings.LLM_ROUTING.get("cost_sensitivity", "balanced")
+        # 优先使用配置好 API Key 的提供商
+        if settings.ANTHROPIC_API_KEY:
+            self.provider = "anthropic"
+        else:
+            self.provider = "openai"
+        self.cost_sensitivity = settings.LLM_ROUTING.get("cost_sensitivity", "balanced") if hasattr(settings, 'LLM_ROUTING') else "balanced"
 
     async def get_llm(
         self,
