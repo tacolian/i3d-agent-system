@@ -1,0 +1,132 @@
+# i3d-agent-system Docker Compose配置
+version: '3.8'
+
+services:
+  # Agent服务
+  agent-api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: i3d-agent-api
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=production
+      - DATABASE_URL=postgresql+asyncpg://app_user:app_pass@postgres:5432/i3d_multitenant
+      - REDIS_URL=redis://redis:6379/0
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - LANGCHAIN_API_KEY=${LANGCHAIN_API_KEY}
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+    networks:
+      - i3d-network
+    restart: unless-stopped
+    volumes:
+      - ../logs:/app/logs
+
+  # PostgreSQL数据库
+  postgres:
+    image: pgvector/pgvector:pg15
+    container_name: i3d-postgres
+    environment:
+      - POSTGRES_USER=app_user
+      - POSTGRES_PASSWORD=app_pass
+      - POSTGRES_DB=i3d_multitenant
+    ports:
+      - "15433:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - i3d-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis缓存
+  redis:
+    image: redis:7-alpine
+    container_name: i3d-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - i3d-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # RabbitMQ消息队列
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: i3d-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - i3d-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Prometheus监控
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: i3d-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    networks:
+      - i3d-network
+    restart: unless-stopped
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+
+  # Grafana可视化
+  grafana:
+    image: grafana/grafana:latest
+    container_name: i3d-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana-data:/var/lib/grafana
+    networks:
+      - i3d-network
+    restart: unless-stopped
+    depends_on:
+      - prometheus
+
+networks:
+  i3d-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  redis-data:
+  rabbitmq-data:
+  prometheus-data:
+  grafana-data:

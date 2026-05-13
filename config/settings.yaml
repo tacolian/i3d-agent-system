@@ -1,0 +1,146 @@
+# i3d-agent-system 配置文件
+# 支持多环境配置
+
+app:
+  name: "i3d-agent-system"
+  version: "1.0.0"
+  environment: "development"  # development | staging | production
+
+server:
+  host: "0.0.0.0"
+  port: 8000
+  workers: 4
+  reload: true
+
+database:
+  url: "postgresql+asyncpg://app_user:app_pass@localhost:15433/i3d_multitenant"
+  pool_size: 20
+  max_overflow: 10
+  echo: false
+
+redis:
+  url: "redis://localhost:6379/0"
+  cache_ttl: 3600
+  session_ttl: 86400
+
+rabbitmq:
+  url: "amqp://guest:guest@localhost:5672/"
+  queue: "i3d.agent.tasks"
+  exchange: "i3d.agent.exchange"
+
+minio:
+  endpoint: "172.16.45.33:9000"
+  access_key: ""
+  secret_key: ""
+  secure: false
+
+llm:
+  openai_api_key: ""
+  anthropic_api_key: ""
+  base_url: null
+
+  models:
+    primary: "claude-sonnet-4-20250514"    # 通用任务
+    fast: "claude-haiku-4-20250123"        # 快速响应
+    complex: "claude-opus-4-20250514"      # 复杂推理
+    embedding: "text-embedding-3-small"
+
+  # 智能路由配置
+  routing:
+    enabled: true
+    complexity_threshold: 0.7
+    cost_sensitivity: "balanced"  # low | balanced | high
+
+langsmith:
+  enabled: true
+  api_key: ""
+  project: "i3d-agent-system"
+  endpoint: "https://api.smith.langchain.com"
+
+rag:
+  # 文档处理
+  chunk_size: 512
+  chunk_overlap: 50
+
+  # 检索配置
+  top_k: 10
+  rerank_top_k: 5
+  similarity_threshold: 0.7
+
+  # 混合检索权重
+  bm25_weight: 0.3
+  vector_weight: 0.7
+
+  # 重排序
+  reranker:
+    enabled: true
+    model: "cohere-rerank-v3"  # cohere-rerank-v3 | bge-reranker-v2
+
+agent:
+  max_iterations: 10
+  timeout: 120
+  stream_response: true
+
+  # 工具配置
+  tools:
+    cad_search:
+      enabled: true
+      timeout: 30
+    similarity_search:
+      enabled: true
+      timeout: 30
+    metadata_query:
+      enabled: true
+      timeout: 10
+    file_analyzer:
+      enabled: true
+      timeout: 60
+
+tenant:
+  supported: ["shenfa", "meidi", "dongjiang", "huabei"]
+  default: "shenfa"
+
+logging:
+  level: "INFO"  # DEBUG | INFO | WARNING | ERROR
+  format: "json"  # json | text
+  dir: "./logs"
+
+  # 日志保留
+  retention:
+    days: 30
+    max_size_mb: 1024
+
+security:
+  secret_key: ""
+  algorithm: "HS256"
+  access_token_expire_minutes: 30
+  refresh_token_expire_days: 7
+
+  cors:
+    enabled: true
+    origins: ["*"]
+    methods: ["GET", "POST", "PUT", "DELETE"]
+    headers: ["*"]
+
+monitoring:
+  prometheus:
+    enabled: true
+    port: 9090
+
+  health_check:
+    enabled: true
+    interval_seconds: 30
+
+environments:
+  development:
+    debug: true
+    log_level: "DEBUG"
+
+  staging:
+    debug: false
+    log_level: "INFO"
+
+  production:
+    debug: false
+    log_level: "WARNING"
+    workers: 8
