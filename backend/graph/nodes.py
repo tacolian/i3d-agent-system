@@ -96,19 +96,47 @@ async def retrieval_node(state: AgentState) -> AgentState:
 
     state["search_params"] = search_params
 
-    # 根据意图执行检索
+    # 根据意图执行检索 - 通过工具层调用外部服务
+    results = []
+    tool_used = None
+
     if intent in ["search", "similarity", "unknown"]:
-        # 执行向量检索
-        from ..rag.hybrid_search import hybrid_search
+        # 判断是相似度搜索还是普通搜索
+        is_similarity = any(kw in user_input.lower() for kw in ["相似", "类似", "similar", "like"])
 
-        results = await hybrid_search(
-            query=user_input,
-            tenant_id=tenant_id,
-            top_k=max_results,
-        )
+        if is_similarity:
+            # 使用相似度搜索工具
+            from ..tools.similarity_search import similarity_search_tool
+            result = await similarity_search_tool(
+                query=user_input,
+                tenant_id=tenant_id,
+                top_k=max_results,
+            )
+            tool_used = "similarity_search"
+        else:
+            # 使用CAD搜索工具调用外部服务
+            from ..tools.cad_search import cad_search_tool, CadSearchParams
+            params = CadSearchParams(
+                query=user_input,
+                tenant_id=tenant_id,
+                top_k=max_results,
+            )
+            result = await cad_search_tool(params)
+            tool_used = "cad_search"
 
-        state["search_results"] = results
-        state["retrieval_context"] = _format_results_as_context(results)
+        if result.get("success"):
+            results = result.get("results", [])
+
+        # 记录工具调用
+        state["tool_calls"].append({
+            "tool_name": tool_used,
+            "arguments": search_params,
+            "result": f"找到 {len(results)} 个结果",
+            "duration_ms": result.get("duration_ms", 0),
+        })
+
+    state["search_results"] = results
+    state["retrieval_context"] = _format_results_as_context(results)
 
     # 更新延迟指标
     duration = (time.time() - start_time) * 1000
@@ -147,6 +175,7 @@ async def search_node(state: AgentState) -> AgentState:
             tenant_id=state["tenant_id"],
             session_id=state["session_id"],
             search_results=state["search_results"],
+            max_results=state.get("max_results", 10),
         )
     )
 
@@ -175,6 +204,7 @@ async def analysis_node(state: AgentState) -> AgentState:
             tenant_id=state["tenant_id"],
             session_id=state["session_id"],
             search_results=state["search_results"],
+            max_results=state.get("max_results", 10),
         )
     )
 
@@ -202,6 +232,7 @@ async def recommendation_node(state: AgentState) -> AgentState:
             tenant_id=state["tenant_id"],
             session_id=state["session_id"],
             search_results=state["search_results"],
+            max_results=state.get("max_results", 10),
         )
     )
 
@@ -231,6 +262,7 @@ async def qa_node(state: AgentState) -> AgentState:
             session_id=state["session_id"],
             search_results=state["search_results"],
             context=state["retrieval_context"],
+            max_results=state.get("max_results", 10),
         )
     )
 

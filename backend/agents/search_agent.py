@@ -2,14 +2,14 @@
 搜索Agent
 负责处理CAD模型搜索请求
 """
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 import time
 
 from langchain_core.messages import SystemMessage, HumanMessage
 
 from .base import BaseAgent, AgentInput, AgentOutput
 from ..models.enums import AgentType
-from ..tools.cad_search import cad_search_tool
+from ..tools.cad_search import cad_search_tool, CadSearchParams
 from ..tools.similarity_search import similarity_search_tool
 
 
@@ -36,7 +36,7 @@ class SearchAgent(BaseAgent):
 ## 工作流程
 
 1. 理解用户的搜索需求
-2. 从提供的搜索结果中筛选最相关的模型
+2. 调用搜索工具查找相关模型
 3. 以清晰、有条理的方式呈现结果
 4. 提供相关的搜索建议
 
@@ -74,7 +74,40 @@ class SearchAgent(BaseAgent):
 
         query = input_data.query
         tenant_id = input_data.tenant_id
+        max_results = input_data.max_results or 10
+
+        # 判断是否需要调用外部服务
+        # 如果 search_results 为空，需要调用工具进行搜索
         search_results = input_data.search_results
+        tool_used = None
+
+        if not search_results or len(search_results) == 0:
+            # 判断是相似度搜索还是普通搜索
+            is_similarity = any(kw in query.lower() for kw in ["相似", "类似", "similar", "like"])
+
+            if is_similarity:
+                # 使用相似度搜索工具
+                result = await similarity_search_tool(
+                    query=query,
+                    tenant_id=tenant_id,
+                    top_k=max_results,
+                )
+                tool_used = "similarity_search"
+            else:
+                # 使用CAD搜索工具
+                params = CadSearchParams(
+                    query=query,
+                    tenant_id=tenant_id,
+                    top_k=max_results,
+                )
+                result = await cad_search_tool(params)
+                tool_used = "cad_search"
+
+            if result.get("success"):
+                search_results = result.get("results", [])
+
+        # 构建上下文信息
+        additional_context = f"使用的搜索工具: {tool_used}" if tool_used else ""
 
         # 构建消息
         messages = [
@@ -82,6 +115,7 @@ class SearchAgent(BaseAgent):
             HumanMessage(content=self._format_context(
                 query=query,
                 search_results=search_results,
+                additional_context=additional_context,
             )),
         ]
 
@@ -96,12 +130,12 @@ class SearchAgent(BaseAgent):
 
         # 收集工具调用记录
         tool_calls = []
-        if search_results:
+        if tool_used:
             tool_calls.append({
-                "tool": "cad_search",
-                "query": query,
-                "result_count": len(search_results),
-                "timestamp": time.time(),
+                "tool_name": tool_used,
+                "arguments": {"query": query, "top_k": max_results},
+                "result": f"找到 {len(search_results)} 个结果" if search_results else "未找到结果",
+                "duration_ms": result.get("duration_ms", 0),
             })
 
         duration = (time.time() - start_time) * 1000
@@ -114,6 +148,7 @@ class SearchAgent(BaseAgent):
             metadata={
                 "duration_ms": duration,
                 "result_count": len(search_results),
+                "tool_used": tool_used,
             },
         )
 

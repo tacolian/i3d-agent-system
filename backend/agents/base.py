@@ -25,6 +25,7 @@ class AgentInput:
         search_results: Optional[List[Dict[str, Any]]] = None,
         context: Optional[str] = None,
         metadata: Optional[Dict[str, Any]] = None,
+        max_results: Optional[int] = None,
     ):
         self.query = query
         self.tenant_id = tenant_id
@@ -32,6 +33,7 @@ class AgentInput:
         self.search_results = search_results or []
         self.context = context or ""
         self.metadata = metadata or {}
+        self.max_results = max_results or 10
 
 
 class AgentOutput:

@@ -2,13 +2,14 @@
 推荐Agent
 负责提供CAD模型推荐和设计建议
 """
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 import time
 
 from langchain_core.messages import SystemMessage, HumanMessage
 
 from .base import BaseAgent, AgentInput, AgentOutput
 from ..models.enums import AgentType
+from ..tools.similarity_search import similarity_search_tool
 
 
 class RecommendationAgent(BaseAgent):
@@ -73,13 +74,52 @@ class RecommendationAgent(BaseAgent):
         start_time = time.time()
 
         query = input_data.query
+        tenant_id = input_data.tenant_id
         search_results = input_data.search_results
+        max_results = input_data.max_results or 10
+
+        # 如果搜索结果较少，使用相似度搜索获取更多推荐
+        tool_calls = []
+        additional_results = []
+
+        if not search_results or len(search_results) < 3:
+            # 使用相似度搜索工具获取更多推荐
+            result = await similarity_search_tool(
+                query=query,
+                tenant_id=tenant_id,
+                top_k=max_results * 2,  # 获取更多候选
+            )
+
+            tool_calls.append({
+                "tool_name": "similarity_search",
+                "arguments": {"query": query, "top_k": max_results * 2},
+                "result": f"找到 {result.get('count', 0)} 个相似结果",
+                "duration_ms": result.get("duration_ms", 0),
+            })
+
+            if result.get("success"):
+                additional_results = result.get("results", [])
+
+        # 合并结果
+        all_results = search_results + additional_results
+        # 去重（基于item_code）
+        seen = set()
+        unique_results = []
+        for r in all_results:
+            item_code = r.get("item_code")
+            if item_code and item_code not in seen:
+                seen.add(item_code)
+                unique_results.append(r)
+
+        # 按相似度排序
+        unique_results.sort(key=lambda x: x.get("similarity", 0), reverse=True)
+        final_results = unique_results[:max_results]
 
         # 构建消息
         context = self._format_context(
             query=query,
-            search_results=search_results,
-            additional_context=input_data.context,
+            search_results=final_results,
+            additional_context=input_data.context or f"基于相似度搜索生成推荐，共找到 {len(final_results)} 个推荐模型",
         )
 
         messages = [
@@ -93,7 +133,7 @@ class RecommendationAgent(BaseAgent):
         # 生成推荐建议
         suggestions = self._generate_recommendation_suggestions(
             query=query,
-            search_results=search_results,
+            search_results=final_results,
         )
 
         duration = (time.time() - start_time) * 1000
@@ -101,10 +141,13 @@ class RecommendationAgent(BaseAgent):
         return AgentOutput(
             response=response,
             agent_type=self.agent_type,
+            tool_calls=tool_calls,
             suggestions=suggestions,
             metadata={
                 "duration_ms": duration,
-                "recommended_count": len(search_results),
+                "recommended_count": len(final_results),
+                "original_results": len(search_results),
+                "additional_results": len(additional_results),
             },
         )
 
@@ -123,6 +166,8 @@ class RecommendationAgent(BaseAgent):
                 suggestions.append("可以请求对比推荐的几个模型")
             else:
                 suggestions.append("尝试调整搜索条件以获得更好的推荐")
+        else:
+            suggestions.append("提供更多描述信息以获得更好的推荐")
 
         suggestions.append("告诉我更多应用场景以获得更精准的推荐")
         suggestions.append("可以上传参考图片或模型进行相似推荐")
