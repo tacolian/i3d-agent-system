@@ -385,7 +385,8 @@ async function sendStreamRequest(query, msgId) {
                 try {
                     const chunk = JSON.parse(data);
                     if (chunk.chunk_type === 'content' && chunk.content) {
-                        fullContent += chunk.content;
+                        // 后端返回完整响应（非增量），直接替换
+                        fullContent = chunk.content;
                         updateMessage(msgId, { content: fullContent, streaming: true });
                     } else if (chunk.chunk_type === 'tool_call' && chunk.tool_call) {
                         const msg = STATE.messages.find(m => m.id === msgId);

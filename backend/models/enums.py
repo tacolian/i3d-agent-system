@@ -21,6 +21,7 @@ class ResponseType(str, Enum):
     SEARCH_RESULTS = "search_results"  # 搜索结果
     RECOMMENDATIONS = "recommendations"  # 推荐
     CLARIFICATION_QUESTION = "clarification_question"  # 反问
+    SYNTHESIZED = "synthesized"     # 综合响应
     ERROR = "error"                 # 错误
 
 

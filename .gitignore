@@ -1,5 +1,6 @@
 logs/
 .env
+.playwright-mcp/
 .playwright-mcp/console-2026-05-13T13-58-11-002Z.log
 .playwright-mcp/console-2026-05-13T13-59-00-995Z.log
 .playwright-mcp/console-2026-05-13T14-12-43-129Z.log

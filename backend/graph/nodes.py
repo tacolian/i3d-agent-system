@@ -150,16 +150,16 @@ async def search_node(state: AgentState) -> AgentState:
         )
     )
 
-    state["agent_outputs"]["search"] = result["response"]
+    state["agent_outputs"]["search"] = result.response
     state["active_agent"] = "search_agent"
-    state["response"] = result["response"]
+    state["response"] = result.response
     state["response_type"] = "search_results"
-    state["suggestions"] = result.get("suggestions", [])
+    state["suggestions"] = result.suggestions or []
 
     duration = (time.time() - start_time) * 1000
     state = update_state_metrics(state, "agent_execution", duration)
 
-    state["messages"].append(AIMessage(content=result["response"]))
+    state["messages"].append(AIMessage(content=result.response))
 
     return state
 
@@ -178,15 +178,15 @@ async def analysis_node(state: AgentState) -> AgentState:
         )
     )
 
-    state["agent_outputs"]["analysis"] = result["response"]
+    state["agent_outputs"]["analysis"] = result.response
     state["active_agent"] = "analysis_agent"
-    state["response"] = result["response"]
+    state["response"] = result.response
     state["response_type"] = "analysis"
 
     duration = (time.time() - start_time) * 1000
     state = update_state_metrics(state, "agent_execution", duration)
 
-    state["messages"].append(AIMessage(content=result["response"]))
+    state["messages"].append(AIMessage(content=result.response))
 
     return state
 
@@ -205,16 +205,16 @@ async def recommendation_node(state: AgentState) -> AgentState:
         )
     )
 
-    state["agent_outputs"]["recommendation"] = result["response"]
+    state["agent_outputs"]["recommendation"] = result.response
     state["active_agent"] = "recommendation_agent"
-    state["response"] = result["response"]
+    state["response"] = result.response
     state["response_type"] = "recommendations"
-    state["suggestions"] = result.get("suggestions", [])
+    state["suggestions"] = result.suggestions or []
 
     duration = (time.time() - start_time) * 1000
     state = update_state_metrics(state, "agent_execution", duration)
 
-    state["messages"].append(AIMessage(content=result["response"]))
+    state["messages"].append(AIMessage(content=result.response))
 
     return state
 
@@ -234,15 +234,15 @@ async def qa_node(state: AgentState) -> AgentState:
         )
     )
 
-    state["agent_outputs"]["qa"] = result["response"]
+    state["agent_outputs"]["qa"] = result.response
     state["active_agent"] = "qa_agent"
-    state["response"] = result["response"]
+    state["response"] = result.response
     state["response_type"] = "answer"
 
     duration = (time.time() - start_time) * 1000
     state = update_state_metrics(state, "agent_execution", duration)
 
-    state["messages"].append(AIMessage(content=result["response"]))
+    state["messages"].append(AIMessage(content=result.response))
 
     return state
 

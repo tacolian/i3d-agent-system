@@ -42,15 +42,15 @@ class LLMRouter:
     MODELS = {
         ModelTier.FAST: {
             "anthropic": "claude-haiku-4-20250123",
-            "openai": "kimi-for-coding",
+            "openai": "deepseek-v4-flash",
         },
         ModelTier.BALANCED: {
             "anthropic": "claude-sonnet-4-20250514",
-            "openai": "kimi-for-coding",
+            "openai": "deepseek-v4-flash",
         },
         ModelTier.COMPLEX: {
             "anthropic": "claude-opus-4-20250514",
-            "openai": "kimi-for-coding",
+            "openai": "deepseek-v4-flash",
         },
     }
 

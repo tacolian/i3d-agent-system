@@ -135,8 +135,8 @@ class AgentWorkflow:
 
         # 执行工作流
         if stream:
-            # 流式执行
-            async for chunk in self.graph.astream(initial_state, config):
+            # 流式执行 - 使用 values 模式返回完整状态
+            async for chunk in self.graph.astream(initial_state, config, stream_mode="values"):
                 yield chunk
         else:
             # 一次性执行
